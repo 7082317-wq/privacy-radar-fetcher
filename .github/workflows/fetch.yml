@@ -16,7 +16,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - run: pip install feedparser supabase googletrans==4.0.0rc1
+      - run: pip install feedparser supabase deep-translator beautifulsoup4
 
       - run: python fetch_news.py
         env:
