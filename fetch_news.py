@@ -1,6 +1,7 @@
 import feedparser
 from supabase import create_client
 import os
+import re
 
 SUPABASE_URL = os.environ["SUPABASE_URL"]
 SUPABASE_KEY = os.environ["SUPABASE_KEY"]
@@ -18,7 +19,9 @@ for source_name, rss_url in feeds:
     for entry in feed.entries[:5]:
 
         title = entry.title
-        summary = entry.summary if "summary" in entry else ""
+        raw_summary = entry.summary if "summary" in entry else ""
+        summary = re.sub(r'<[^>]+>', '', raw_summary)
+        summary = summary.strip()
         url = entry.link
 
         existing = supabase.table("issues").select("id").eq("url", url).execute()
