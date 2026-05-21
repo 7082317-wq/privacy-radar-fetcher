@@ -1,6 +1,6 @@
 import feedparser
 from supabase import create_client
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import os
 import re
 
@@ -9,7 +9,6 @@ SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-translator = Translator()
 
 feeds = [
 
@@ -194,10 +193,7 @@ for source_name, rss_url in feeds:
 
             # 번역
             try:
-                translated_title = translator.translate(
-                    title,
-                    dest='ko'
-                ).text
+                translated_title = GoogleTranslator(source='auto', target='ko').translate(title)
 
             except:
                 translated_title = title
