@@ -1,6 +1,7 @@
 import feedparser
 from supabase import create_client
 from deep_translator import GoogleTranslator
+from datetime import datetime
 import os
 import re
 
@@ -129,56 +130,6 @@ PRIVACY_IMPLICATION_MAPPING = {
     "surveillance": "감시 가능성 증가",
 }
 
-CATEGORY_RULES = {
-    "dpa": [
-        "ico",
-        "edpb",
-        "cnil",
-        "privacy commissioner",
-        "pdpc",
-        "guidelines",
-        "guidance",
-        "framework",
-        "recommendation"
-    ],
-
-    "cases": [
-        "court",
-        "decision",
-        "investigation",
-        "enforcement",
-        "complaint",
-        "lawsuit",
-        "ruling",
-        "fine",
-        "openai case"
-    ],
-
-    "products": [
-        "meta",
-        "google io",
-        "wearable",
-        "smart glasses",
-        "ai device",
-        "chatgpt",
-        "gemini",
-        "copilot",
-        "claude",
-        "whatsapp ai"
-    ],
-
-    "emerging": [
-        "ai agent",
-        "openclaw",
-        "autonomous",
-        "computer use",
-        "persistent memory",
-        "tool calling",
-        "ambient computing",
-        "multi agent"
-    ]
-}
-
 CATEGORY_MAPPING = {
 
     # AI companies
@@ -207,32 +158,6 @@ CATEGORY_MAPPING = {
 }
 
 
-def classify_category(text):
-    """키워드 매칭 점수를 기반으로 카테고리 분류"""
-    text = text.lower()
-
-    scores = {
-        "dpa": 0,
-        "cases": 0,
-        "products": 0,
-        "emerging": 0
-    }
-
-    for category, keywords in CATEGORY_RULES.items():
-
-        for keyword in keywords:
-
-            if keyword in text:
-                scores[category] += 1
-
-    best_category = max(scores, key=scores.get)
-
-    if scores[best_category] == 0:
-        return "emerging"
-
-    return best_category
-
-
 def detect_source_type(source_name):
     """source_name에 따라 출처 타입 분류"""
     source_name = source_name.lower()
@@ -241,7 +166,7 @@ def detect_source_type(source_name):
         return "dpa"
 
     if source_name in ["nist", "cisa"]:
-        return "security"
+        return "governance"
 
     if source_name in ["openai", "meta", "anthropic", "google", "deepmind"]:
         return "company"
@@ -345,7 +270,9 @@ for source_name, rss_url in feeds:
                 "privacy_implications": list(privacy_implications),
 
                 "novelty_score": novelty_score,
-                "relevance_score": relevance_score
+                "relevance_score": relevance_score,
+
+                "created_at": datetime.utcnow().isoformat(),
 
             }).execute()
 
