@@ -179,6 +179,33 @@ CATEGORY_RULES = {
     ]
 }
 
+CATEGORY_MAPPING = {
+
+    # AI companies
+    "OpenAI": "products",
+    "Meta": "products",
+    "Anthropic": "products",
+    "Google": "products",
+    "DeepMind": "products",
+
+    # AI media / emerging capability
+    "TechCrunch AI": "emerging",
+    "The Verge AI": "emerging",
+    "Ars Technica AI": "emerging",
+    "Wired AI": "emerging",
+
+    # DPA
+    "EDPB": "dpa",
+    "ICO": "dpa",
+    "CNIL": "dpa",
+    "OPC Canada": "dpa",
+    "PDPC Singapore": "dpa",
+
+    # Governance / Standards
+    "NIST": "governance",
+    "CISA": "governance",
+}
+
 
 def classify_category(text):
     """키워드 매칭 점수를 기반으로 카테고리 분류"""
@@ -284,9 +311,6 @@ for source_name, rss_url in feeds:
                 print(f"Already exists: {title}")
                 continue
 
-            # 카테고리 자동 분류
-            category = classify_category(text)
-
             # 번역
             try:
                 translated_title = GoogleTranslator(source='auto', target='ko').translate(title)
@@ -315,7 +339,7 @@ for source_name, rss_url in feeds:
                 "source_type": detect_source_type(source_name),
                 "url": url,
 
-                "category": category,
+                "category": CATEGORY_MAPPING.get(source_name, "emerging"),
 
                 "capability_tags": capability_tags,
                 "privacy_implications": list(privacy_implications),
