@@ -180,16 +180,30 @@ CATEGORY_RULES = {
 }
 
 
-def categorize_article(text):
-    """자동으로 기사를 카테고리로 분류"""
-    text_lower = text.lower()
-    
+def classify_category(text):
+    """키워드 매칭 점수를 기반으로 카테고리 분류"""
+    text = text.lower()
+
+    scores = {
+        "dpa": 0,
+        "cases": 0,
+        "products": 0,
+        "emerging": 0
+    }
+
     for category, keywords in CATEGORY_RULES.items():
+
         for keyword in keywords:
-            if keyword in text_lower:
-                return category
-    
-    return "emerging"  # 기본값
+
+            if keyword in text:
+                scores[category] += 1
+
+    best_category = max(scores, key=scores.get)
+
+    if scores[best_category] == 0:
+        return "emerging"
+
+    return best_category
 
 
 for source_name, rss_url in feeds:
@@ -255,7 +269,7 @@ for source_name, rss_url in feeds:
                 continue
 
             # 카테고리 자동 분류
-            category = categorize_article(text)
+            category = classify_category(text)
 
             # 번역
             try:
