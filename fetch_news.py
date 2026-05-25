@@ -129,6 +129,69 @@ PRIVACY_IMPLICATION_MAPPING = {
     "surveillance": "감시 가능성 증가",
 }
 
+CATEGORY_RULES = {
+    "dpa": [
+        "ico",
+        "edpb",
+        "cnil",
+        "privacy commissioner",
+        "pdpc",
+        "guidelines",
+        "guidance",
+        "framework",
+        "recommendation"
+    ],
+
+    "cases": [
+        "court",
+        "decision",
+        "investigation",
+        "enforcement",
+        "complaint",
+        "lawsuit",
+        "ruling",
+        "fine",
+        "openai case"
+    ],
+
+    "products": [
+        "meta",
+        "google io",
+        "wearable",
+        "smart glasses",
+        "ai device",
+        "chatgpt",
+        "gemini",
+        "copilot",
+        "claude",
+        "whatsapp ai"
+    ],
+
+    "emerging": [
+        "ai agent",
+        "openclaw",
+        "autonomous",
+        "computer use",
+        "persistent memory",
+        "tool calling",
+        "ambient computing",
+        "multi agent"
+    ]
+}
+
+
+def categorize_article(text):
+    """자동으로 기사를 카테고리로 분류"""
+    text_lower = text.lower()
+    
+    for category, keywords in CATEGORY_RULES.items():
+        for keyword in keywords:
+            if keyword in text_lower:
+                return category
+    
+    return "emerging"  # 기본값
+
+
 for source_name, rss_url in feeds:
 
     print(f"\nChecking feed: {source_name}")
@@ -191,6 +254,9 @@ for source_name, rss_url in feeds:
                 print(f"Already exists: {title}")
                 continue
 
+            # 카테고리 자동 분류
+            category = categorize_article(text)
+
             # 번역
             try:
                 translated_title = GoogleTranslator(source='auto', target='ko').translate(title)
@@ -199,10 +265,9 @@ for source_name, rss_url in feeds:
                 translated_title = title
 
             try:
-                translated_summary = translator.translate(
-                    summary[:1000],
-                    dest='ko'
-                ).text
+                translated_summary = GoogleTranslator(source='auto', target='ko').translate(
+                    summary[:1000]
+                )
 
             except:
                 translated_summary = summary[:1000]
@@ -219,7 +284,7 @@ for source_name, rss_url in feeds:
                 "source": source_name,
                 "url": url,
 
-                "category": "Emerging AI Capability",
+                "category": category,
 
                 "capability_tags": capability_tags,
                 "privacy_implications": list(privacy_implications),
