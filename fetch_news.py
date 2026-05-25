@@ -206,6 +206,22 @@ def classify_category(text):
     return best_category
 
 
+def detect_source_type(source_name):
+    """source_name에 따라 출처 타입 분류"""
+    source_name = source_name.lower()
+
+    if source_name in ["edpb", "ico", "cnil", "opc canada", "pdpc singapore"]:
+        return "dpa"
+
+    if source_name in ["nist", "cisa"]:
+        return "security"
+
+    if source_name in ["openai", "meta", "anthropic", "google", "deepmind"]:
+        return "company"
+
+    return "media"
+
+
 for source_name, rss_url in feeds:
 
     print(f"\nChecking feed: {source_name}")
@@ -296,6 +312,7 @@ for source_name, rss_url in feeds:
                 "original_summary": summary[:1000],
 
                 "source": source_name,
+                "source_type": detect_source_type(source_name),
                 "url": url,
 
                 "category": category,
